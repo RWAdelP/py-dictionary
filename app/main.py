@@ -122,7 +122,7 @@ class Dictionary:
     ) -> None:
         if hasattr(key_values, "items"):
             key_values = key_values.items()
-        for key, value in key_values.items():
+        for key, value in key_values:
             self.__setitem__(key, value)
 
     def __iter__(
