@@ -24,7 +24,6 @@ class Dictionary:
         while (self.buckets[index] is not None
                and self.buckets[index].key != key):
             if counter > self.capacity:
-                print("bugger")
                 break
             index += 1
             index %= self.capacity
@@ -65,12 +64,17 @@ class Dictionary:
             key: Any
     ) -> None:
         index = self._key_index(key)
+        counter = 0
         while self.buckets[index] is not None:
+            if counter > self.capacity:
+                break
             if self.buckets[index].key == key:
                 self.buckets[index] = None
                 self.size -= 1
+                break
             index += 1
             index %= self.capacity
+            counter += 1
 
     def _enlarge(
             self
@@ -93,7 +97,7 @@ class Dictionary:
     def get(
             self,
             key: Any
-    ) -> None:
+    ) -> Any:
         return self.__getitem__(key)
 
     def pop(
