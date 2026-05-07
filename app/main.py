@@ -69,7 +69,8 @@ class Dictionary:
     ) -> None:
         index = self._key_index(key)
         counter = 0
-        while self.buckets[index] is not None:
+        while (self.buckets[index] is not None
+               and self.buckets[index] is not Dictionary.TOMBSTONE):
             if counter > self.capacity:
                 break
             if self.buckets[index].key == key:
