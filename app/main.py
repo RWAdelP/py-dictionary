@@ -2,6 +2,8 @@ from typing import Any
 
 
 class Dictionary:
+    TOMBSTONE = object()
+
     def __init__(
             self,
             initial_capacity: int = 8
@@ -22,6 +24,7 @@ class Dictionary:
         index = self._key_index(key)
         counter = 0
         while (self.buckets[index] is not None
+               and self.buckets[index] is not Dictionary.TOMBSTONE
                and self.buckets[index].key != key):
             if counter > self.capacity:
                 break
@@ -38,7 +41,8 @@ class Dictionary:
     ) -> Any:
         index = self._key_index(key)
         counter = 0
-        while self.buckets[index] is not None:
+        while (self.buckets[index] is not None
+               and self.buckets[index] is not Dictionary.TOMBSTONE):
             if counter > self.capacity:
                 break
             if self.buckets[index].key == key:
@@ -69,7 +73,7 @@ class Dictionary:
             if counter > self.capacity:
                 break
             if self.buckets[index].key == key:
-                self.buckets[index] = None
+                self.buckets[index] = Dictionary.TOMBSTONE
                 self.size -= 1
                 break
             index += 1
@@ -96,9 +100,13 @@ class Dictionary:
 
     def get(
             self,
-            key: Any
+            key: Any,
+            default: Any = None
     ) -> Any:
-        return self.__getitem__(key)
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
 
     def pop(
             self,
@@ -112,13 +120,17 @@ class Dictionary:
             self,
             key_values: iter
     ) -> None:
+        if hasattr(key_values, "items"):
+            key_values = key_values.items()
         for key, value in key_values.items():
             self.__setitem__(key, value)
 
     def __iter__(
             self
-    ) -> iter:
-        return iter(self.buckets)
+    ) -> Any:
+        for node in self.buckets:
+            if node is not None and node is not Dictionary.TOMBSTONE:
+                yield node.key
 
 
 class Node:
